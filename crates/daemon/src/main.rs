@@ -9,7 +9,7 @@ use crate::{daemon::Daemon, server::start_server};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let engine = EngineRuntime::new("./lunio-cache".into());
+    let engine = EngineRuntime::new(".lunio-cache".into());
 
     println!("[lunio-daemon] scanning...");
     engine.full_scan(".");

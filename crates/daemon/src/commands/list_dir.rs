@@ -1,18 +1,15 @@
-use std::sync::Arc;
+use std::{path::Path, sync::Arc};
 
 use lunio_core::EngineRuntime;
 
 use crate::protocol::{DaemonFileEntry, Response, ResponseData};
 
-pub async fn handle_search(
-    engine: Arc<EngineRuntime>,
-    query: String,
-    limit: Option<usize>
-) -> Response {
-    let results = engine.search(&query, limit.unwrap_or(50));
+pub async fn handle_list_dir(engine: Arc<EngineRuntime>, path: String) -> Response {
+    let path = Path::new(&path);
 
-    let entries = results
-        .into_iter()
+    let entries = engine.list_dir(path);
+
+    let out: Vec<DaemonFileEntry> = entries.into_iter()
         .map(|m| DaemonFileEntry {
             id: format!("{:032x}", m.id.0),
             path: m.path.to_string_lossy().into_owned(),
@@ -23,7 +20,7 @@ pub async fn handle_search(
                 .map(|d| d.as_secs() as i64),
             has_thumbnail: m.has_thumbnail
         })
-        .collect::<Vec<_>>();
-
-    Response::Ok { data: Some(ResponseData::SearchResults { entries }) }
+        .collect();
+    
+    Response::Ok { data: Some(ResponseData::DirectoryListing { entries: out }) }
 }

@@ -19,6 +19,14 @@ impl SimpleIndex {
     pub fn remove(&mut self, id: FileId) {
         self.files.remove(&id);
     }
+
+    pub fn get(&self, id: FileId) -> Option<&FileMeta> {
+        self.files.get(&id)
+    }
+
+    pub fn len(&self) -> usize {
+        self.files.len()
+    }
     
     pub fn apply_change(&mut self, id: FileId, meta: Option<FileMeta>) {
         match meta {
@@ -39,10 +47,13 @@ impl SimpleIndex {
     }
 
     pub fn search(&self, query: &str, limit: usize) -> Vec<FileMeta> {
-        let q = query.to_string();
+        let q = query.to_lowercase();
         let mut out = Vec::new();
 
-        for meta in self.files.values() {
+        let mut entries: Vec<_> = self.files.values().collect();
+        entries.sort_by_key(|m| m.path.clone());
+
+        for meta in entries {
             let name = match meta.path.file_name() {
                 Some(n) => n.to_string_lossy().to_lowercase(),
                 None => continue

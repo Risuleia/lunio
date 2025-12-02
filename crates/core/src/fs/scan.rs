@@ -1,31 +1,18 @@
 use std::{path::Path};
-
 use rayon::iter::{ParallelBridge, ParallelIterator};
 use walkdir::{DirEntry, WalkDir};
 
-use crate::models::{FileId, FileMeta};
+use crate::{fs::id::generate_file_id, models::FileMeta};
 
 #[inline]
 fn is_valid(entry: &DirEntry) -> bool {
-    if entry.file_type().is_symlink() {
-        return false
-    }
-
-    true
-}
-
-#[inline]
-fn generate_file_id(path: &Path) -> FileId {
-    use std::hash::{Hash, Hasher};
-
-    let mut hasher = ahash::AHasher::default();
-    path.hash(&mut hasher);
-
-    FileId(hasher.finish())
+    let ft = entry.file_type();
+    ft.is_file() | ft.is_dir()
 }
 
 pub fn scan_root<P: AsRef<Path>>(root: P) -> Vec<FileMeta> {
     WalkDir::new(root)
+        .follow_links(false)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| is_valid(e))
@@ -33,12 +20,18 @@ pub fn scan_root<P: AsRef<Path>>(root: P) -> Vec<FileMeta> {
         .filter_map(|entry| {
             let path = entry.path().to_path_buf();
             let metadata = entry.metadata().ok()?;
+            let id = generate_file_id(&path);
 
             Some(FileMeta {
-                id: generate_file_id(entry.path()),
+                version: 1,
+                id,
                 path,
                 size: metadata.len(),
-                is_dir: metadata.is_dir(),
+                kind: if metadata.is_dir() {
+                    crate::models::FileKind::Directory
+                } else {
+                    crate::models::FileKind::File
+                },
                 modified: metadata.modified().ok(),
                 created: metadata.created().ok(),
                 has_thumbnail: false

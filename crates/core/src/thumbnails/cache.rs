@@ -25,8 +25,8 @@ impl ThumbnailCache {
         }
 
         let disk = self.cfg.disk_path_for(id);
-        if disk.exists() {
-            if let Ok(bytes) = fs::read(&disk) {
+        if let Ok(bytes) = fs::read(&disk) {
+            if bytes.len() <= self.cfg.max_mem_bytes {
                 let arc: Arc<[u8]> = Arc::from(bytes.into_boxed_slice());
                 self.mem.insert(id, arc.clone());
                 return Some(arc);
@@ -43,10 +43,14 @@ impl ThumbnailCache {
             fs::create_dir_all(parent)?;
         }
 
-        fs::write(&disk, bytes)?;
+        let tmp = disk.with_extension("tmp");
+        fs::write(&tmp, bytes)?;
+        fs::rename(tmp, &disk)?;
 
-        let arc = Arc::from(bytes.to_vec().into_boxed_slice());
-        self.mem.insert(id, arc);
+        if bytes.len() <= self.cfg.max_mem_bytes {
+            let arc = Arc::from(bytes.to_vec().into_boxed_slice());
+            self.mem.insert(id, arc);
+        }
 
         Ok(())
     }

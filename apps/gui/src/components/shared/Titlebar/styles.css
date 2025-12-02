@@ -1,0 +1,169 @@
+#titlebar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+    z-index: 110;
+    flex-shrink: 0;
+}
+
+#titlebar .titlebar-left {
+    width: 250px;
+    border-right: 2px solid var(--border-clr-1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .6rem 1rem;
+    flex-shrink: 0;
+}
+
+#titlebar .titlebar-left .window-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .3rem;
+    padding: .3rem;
+    border: 1px solid var(--border-clr-1);
+    border-radius: 3ex;
+    background: linear-gradient(to bottom right,
+                    rgba(255, 255, 255, 0.1),
+                    rgba(255, 255, 255, 0.05),
+                    rgba(255, 255, 255, 0.05)
+                );
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2)
+}
+
+#titlebar .titlebar-left .window-controls .control-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    padding: .3rem;
+}
+#titlebar .titlebar-left .window-controls .control-btn span {
+    font-size: 1rem;
+}
+
+
+#titlebar .titlebar-left .window-controls .control-btn:hover,
+#titlebar .titlebar-left .window-controls .control-btn:active {
+    background: var(--bg-clr);
+    color: var(--btn-clr);
+}
+
+#titlebar .titlebar-left .window-controls .control-btn:nth-of-type(1) {
+    --btn-clr: #f87171;
+    --bg-clr: rgba(236, 72, 153, .2);
+}
+#titlebar .titlebar-left .window-controls .control-btn:nth-of-type(2) {
+    --btn-clr: #facc15;
+    --bg-clr: rgba(245, 158, 11, .2);
+}
+#titlebar .titlebar-left .window-controls .control-btn:nth-of-type(3) {
+    --btn-clr: #4ade80;
+    --bg-clr: rgba(16, 185, 129, .2);
+}
+
+#titlebar .titlebar-left .settings-btn {
+    border-radius: 1ex;
+    padding: .3rem;
+    color: rgba(163, 163, 163, 10);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+}
+#titlebar .titlebar-left .settings-btn:hover,
+#titlebar .titlebar-left .settings-btn:active {
+    background: rgba(255, 255, 255, .1);
+    color: #e5e5e5;
+}
+
+#titlebar .titlebar-right {
+    width: calc(100% - 250px - 2px);
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    overflow: hidden;
+    border-bottom: 2px solid var(--border-clr-1);
+    flex-shrink: 0;
+    padding: .6rem;
+    gap: 2rem;
+}
+
+#titlebar .titlebar-tabs {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    overflow-x: scroll;
+    gap: .4rem;
+}
+
+#titlebar .tab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 160px;
+    width: 160px;
+    gap: .4rem;
+    padding: .4rem;
+    border-radius: 1.5ex;
+    color: #d4d4d4;
+}
+#titlebar .tab .tab-icon {
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#titlebar .tab .tab-title {
+    font-size: .9rem;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+#titlebar .tab .tab-close {
+    border-radius: 100%;
+    padding: .1rem;
+    color: rgba(163, 163, 163, 10);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+}
+#titlebar .tab .tab-close:hover,
+#titlebar .tab .tab-close:active {
+    background: rgba(255, 255, 255, .1);
+    color: #e5e5e5;
+}
+
+#titlebar .tab.active {
+    background: var(--primary-grad);
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2),
+                0 4px 6px -4px rgba(59, 130, 246, 0.2);
+    color: #e5e5e5;
+}
+#titlebar .tab:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+#titlebar .tab.active .tab-close {
+    color: #e5e5e5;
+}
+
+#titlebar .titlebar-add {
+    border-radius: 1ex;
+    padding: .3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+}
+#titlebar .titlebar-add:hover,
+#titlebar .titlebar-add:active {
+    background: rgba(255, 255, 255, .1);
+    color: #e5e5e5;
+}

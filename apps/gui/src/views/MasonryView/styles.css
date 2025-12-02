@@ -1,0 +1,52 @@
+.masonry-view {
+  display: flex;
+  gap: 16px;
+  padding: var(--pad) calc(1.5 * var(--pad));
+}
+
+.masonry-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.masonry-tile {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.03);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+
+.masonry-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.masonry-tile img {
+  width: 100%;
+  display: block;
+}
+.masonry-skeleton {
+  width: 100%;
+  aspect-ratio: 1.2;
+}
+
+.masonry-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 10px;
+  padding-top: 30px;
+  font-size: .9rem;
+  background: linear-gradient(transparent, rgba(0,0,0,.5));
+  color: #d5d5d5;
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+.masonry-tile:hover .masonry-label {
+  opacity: 1;
+}

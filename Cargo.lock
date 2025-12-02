@@ -1157,6 +1157,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "file-id"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1fc6a637b6dc58414714eddd9170ff187ecb0933d4c7024d1abbd23a3cc26e9"
+dependencies = [
+ "windows-sys 0.60.2",
+]
+
+[[package]]
 name = "find-msvc-tools"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2315,12 +2324,17 @@ dependencies = [
 name = "lunio"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "dirs",
  "lunio_client",
+ "once_cell",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
+ "tokio",
+ "window-vibrancy 0.7.1",
 ]
 
 [[package]]
@@ -2328,6 +2342,7 @@ name = "lunio_client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64 0.22.1",
  "serde",
  "serde_json",
  "tokio",
@@ -2339,8 +2354,10 @@ version = "0.1.0"
 dependencies = [
  "ahash",
  "dashmap",
+ "file-id",
  "image",
  "notify",
+ "parking_lot",
  "rayon",
  "serde",
  "serde_json",
@@ -2353,6 +2370,7 @@ name = "lunio_daemon"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64 0.22.1",
  "lunio_core",
  "serde",
  "serde_json",
@@ -4339,7 +4357,7 @@ dependencies = [
  "url",
  "webkit2gtk",
  "webview2-com",
- "window-vibrancy",
+ "window-vibrancy 0.6.0",
  "windows",
 ]
 
@@ -5323,6 +5341,21 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "raw-window-handle",
  "windows-sys 0.59.0",
+ "windows-version",
+]
+
+[[package]]
+name = "window-vibrancy"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "010797bd7c40396fbc59d3105089fed0885fe267a0ef4a0a4646df54e28647f6"
+dependencies = [
+ "objc2 0.6.3",
+ "objc2-app-kit",
+ "objc2-core-foundation",
+ "objc2-foundation 0.3.2",
+ "raw-window-handle",
+ "windows-sys 0.60.2",
  "windows-version",
 ]
 

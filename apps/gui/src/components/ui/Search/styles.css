@@ -1,0 +1,20 @@
+.search {
+    width: 100%;
+    background-color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .8rem;
+    border-radius: 1px solid var(--border-clr-1);
+    background: rgba(38, 38, 38, 0.379);
+    border-radius: 1.5ex;
+    padding: .6rem 1rem;
+}
+.search input {
+    all: unset;
+    width: 100%;
+}
+
+.search span {
+    color: #d5d5d5;
+}

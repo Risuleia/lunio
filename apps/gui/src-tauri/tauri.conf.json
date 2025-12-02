@@ -16,10 +16,11 @@
         "label": "main",
         "decorations": false,
         "transparent": true,
-        "minWidth": 800,
+        "minWidth": 1000,
         "minHeight": 600
       }
     ],
+    "macOSPrivateApi": true,
     "security": {
       "csp": null
     }

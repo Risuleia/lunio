@@ -1,0 +1,67 @@
+#explorer {
+    --pad: 1rem;
+
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    gap: .4rem;
+}
+
+#explorer .action-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .6rem;
+    padding: var(--pad);
+}
+#explorer .action-bar .btn-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    gap: .3rem;
+    padding: .3rem;
+    border-radius: 1px solid var(--border-clr-1);
+    background: rgba(38, 38, 38, 0.379);
+    border-radius: 2ex;
+}
+#explorer .action-bar .new-btn {
+    border-radius: 2ex;
+    padding: .5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    background: var(--primary-grad);
+    color: #fff;
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2),
+                0 4px 6px -4px rgba(59, 130, 246, 0.2);
+}
+
+#explorer .action-bar .new-btn:hover {
+    filter: opacity(.9);
+}
+
+#explorer .explorer-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+}
+
+
+#explorer .group-header {
+    position: sticky;
+    z-index: 16;
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.35);
+    width: 100%;
+    padding: .6rem calc(1.5 * var(--pad));
+    border-radius: 0 0 2ex 2ex;
+}

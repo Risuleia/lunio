@@ -1,0 +1,15 @@
+.button {
+    border-radius: 1.5ex;
+    padding: .5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    color: #d5d5d5;
+}
+
+.button:hover,
+.button.active {
+    color: #e5e5e5;
+    background-color: rgba(255, 255, 255, 0.1);
+}

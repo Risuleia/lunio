@@ -50,6 +50,9 @@
 .grid-tile:hover {
     background: rgba(255, 255, 255, 0.05);
 }
+.grid-tile[data-selected="true"] {
+    background-color: rgba(76, 132, 221, 0.308);
+}
 
 .grid-view .group-header {
     top: 0;

@@ -2,6 +2,7 @@
   display: flex;
   gap: 16px;
   padding: var(--pad) calc(1.5 * var(--pad));
+  position: relative;
 }
 
 .masonry-column {
@@ -22,6 +23,15 @@
 .masonry-tile:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.masonry-tile[data-selected="true"]::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background-color: rgba(76, 132, 221, 0.308);
+  border: 3px solid rgba(76, 132, 221, 0.726);
+  border-radius: 12px;
 }
 
 .masonry-tile img {

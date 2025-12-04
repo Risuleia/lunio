@@ -1,0 +1,48 @@
+.lasso-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+}
+
+.lasso-path {
+    fill: rgba(110, 170, 255, 0.20);
+
+    stroke: rgba(150, 200, 255, 0.95);
+    stroke-width: 2.8;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter:
+      blur(0.25px)
+      drop-shadow(0 0 4px rgba(140,190,255,0.7));
+
+    transition: stroke 0.12s;
+}
+
+.lasso-glow {
+    fill: none;
+
+    stroke: rgba(130, 190, 255, 0.45);
+    stroke-width: 10;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter:
+      blur(6px)
+      drop-shadow(0 0 18px rgba(130,190,255,0.8));
+
+    opacity: 0.85;
+
+    animation: glowFloat 1.6s ease-in-out infinite;
+}
+
+@keyframes glowFloat {
+    0%   { opacity: 0.55 }
+    50%  { opacity: 0.95 }
+    100% { opacity: 0.55 }
+}

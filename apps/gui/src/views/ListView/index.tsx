@@ -6,12 +6,23 @@ import "./styles.css";
 import { Group } from "../../lib/grouping/types";
 import { sortGroups } from "../../lib/sorting";
 import { getFileIcon } from "../../lib/icons";
+import { openFile } from "../../services/daemon";
 
-export default function ListView({ entries }: { entries: ExplorerItem[] }) {
-  const { navigate, getActiveTab } = useTabs()
+export default function ListView({
+  entries,
+  register
+}: {
+  entries: ExplorerItem[],
+  register: (id: string, el: HTMLElement | null) => void
+}) {
+  const { navigate, getActiveTab, setRenderOrder } = useTabs()
   
   const tab = getActiveTab()
   const [groups, setGroups] = useState<Group<ExplorerItem>[]>([])
+
+  useEffect(() => {
+    setRenderOrder(groups.flatMap(g => g.items.map(i => i.id)))
+  }, [groups])
   
   useEffect(() => {
     setGroups(sortGroups(groupItems(entries, tab.groupMode), tab.sortMode, tab.sortOrder))
@@ -33,9 +44,10 @@ export default function ListView({ entries }: { entries: ExplorerItem[] }) {
             <ListRow
               key={file.id}
               file={file}
+              register={register}
               onOpen={(f) => {
-                if (!f.isDir) return;
-                navigate(f.path);
+                if (f.isDir) navigate(f.path);
+                else openFile(f.path)
               }}
             />
           ))}
@@ -47,13 +59,44 @@ export default function ListView({ entries }: { entries: ExplorerItem[] }) {
 
 function ListRow({
   file,
-  onOpen
+  register,
+  onOpen,
 }: {
   file: ExplorerItem,
-  onOpen: (file: ExplorerItem) => void
+  register: (id: string, el: HTMLElement | null) => void
+  onOpen: (file: ExplorerItem) => void,
 }) {
+  const {
+    selectSingle,
+    toggleSelect,
+    rangeSelect,
+    getActiveTab
+  } = useTabs()
+
+  const selection = getActiveTab().selection
+  const renderOrder = getActiveTab().renderOrder
+  const selected = selection.includes(file.id)
+
   return (
-    <button className="list-row" onDoubleClick={() => onOpen(file)}>
+    <button
+      ref={(e) => register(file.id, e)}
+      className="list-row"
+      onDoubleClick={() => onOpen(file)}
+      data-selected={selected}
+      data-item
+      onClick={(e) => {
+        e.stopPropagation()
+
+        if (e.shiftKey && selection.length)
+          rangeSelect(selection[0], file.id, renderOrder)
+
+        else if (e.ctrlKey || e.metaKey)
+          toggleSelect(file.id)
+
+        else
+          selectSingle(file.id)
+      }}
+    >
       <span className="file-name">
         <span className="material-symbols-rounded">
           {getFileIcon(file)}

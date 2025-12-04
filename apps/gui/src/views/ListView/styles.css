@@ -48,6 +48,9 @@
 .list-row:hover {
     background-color: rgba(255, 255, 255, 0.05);
 }
+.list-row[data-selected="true"] {
+    background-color: rgba(76, 132, 221, 0.308);
+}
 
 .list-view .group-header {
     top: 2.55rem;

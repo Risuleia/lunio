@@ -15,6 +15,7 @@ export interface TabState {
     sortOrder: SortOrder,
     scrollTop: number,
     selection: string[]
+    renderOrder: string[]
 }
 
 interface TabContextType {
@@ -23,18 +24,31 @@ interface TabContextType {
 
     openTab: (location: string) => void,
     closeTab: (id: string) => void,
+    
     navigate: (location: string, newTab?: boolean) => void,
     canGoBack: () => boolean,
     canGoForward: () => boolean,
     goBack: () => void,
     goForward: () => void,
+
     setViewMode: (mode: ViewMode) => void,
     setGroupMode: (mode: GroupMode) => void,
     setSortMode: (mode: SortMode) => void,
     setSortOrder: (order: SortOrder) => void,
+
     setActiveTab: (id: string) => void,
     getActiveTab(): TabState
+    
+
     updateScroll: (scrollTop: number) => void,
+
+    setRenderOrder: (ids: string[]) => void,
+
+    selectAll: (ids: string[]) => void,
+    selectSingle: (id: string) => void,
+    toggleSelect: (id: string) => void,
+    rangeSelect: (anchor: string, id: string, ordered: string[]) => void,
+    clearSelection: () => void,
 }
 
 const TabContext = createContext<TabContextType | null>(null)
@@ -50,13 +64,20 @@ function createTab(location: string): TabState {
         sortMode: "name",
         sortOrder: "asc",
         scrollTop: 0,
-        selection: []
+        selection: [],
+        renderOrder: []
     }
 }
 
 export function TabProvider({ children }: { children: React.ReactNode }) {
     const [tabs, setTabs] = useState<TabState[]>([createTab("virtual://home")])
     const [activeTabId, setActiveTabId] = useState<string>(tabs[0].id)
+
+    function updateTab(fn: (t: TabState) => TabState) {
+        setTabs(tabs => 
+            tabs.map(t => t.id == activeTabId ? fn(t) : t)
+        )
+    }
 
     function getActiveTab(): TabState {
         const tab = tabs.find(t => t.id == activeTabId)
@@ -162,33 +183,54 @@ export function TabProvider({ children }: { children: React.ReactNode }) {
         )
     }
 
+    function setRenderOrder(ids: string[]) {
+        updateTab(tab => ({ ...tab, renderOrder: ids }))
+    }
+
     function setViewMode(mode: ViewMode) {
-        setTabs(t => 
-            t.map(tab => 
-                tab.id == activeTabId ? { ...tab, viewMode: mode } : tab
-            )
-        )
+        updateTab(t => ({ ...t, viewMode: mode }))
     }
     function setGroupMode(mode: GroupMode) {
-        setTabs(t => 
-            t.map(tab => 
-                tab.id == activeTabId ? { ...tab, groupMode: mode } : tab
-            )
-        )
+        updateTab(t => ({ ...t, groupMode: mode }))
     }
     function setSortMode(mode: SortMode) {
-        setTabs(t => 
-            t.map(tab => 
-                tab.id == activeTabId ? { ...tab, sortMode: mode } : tab
-            )
-        )
+        updateTab(t => ({ ...t, sortMode: mode }))
     }
     function setSortOrder(order: SortOrder) {
-        setTabs(t => 
-            t.map(tab => 
-                tab.id == activeTabId ? { ...tab, sortOrder: order } : tab
-            )
-        )
+        updateTab(t => ({ ...t, sortOrder: order }))
+    }
+
+    function clearSelection() {
+        updateTab(t => ({ ...t, selection: [] }))
+    }
+
+    function selectAll(ids: string[]) {
+        updateTab(t => ({ ...t, selection: ids } ))
+    }
+
+    function selectSingle(id: string) {
+        updateTab(t => ({ ...t, selection: [id] }))
+    }
+
+    function toggleSelect(id: string) {
+        updateTab(t => ({
+            ...t,
+            selection: t.selection.includes(id)
+                ? t.selection.filter(x => x != id)
+                : [...t.selection, id]
+        }))
+    }
+
+    function rangeSelect(anchod: string, id: string, ordered: string[]) {
+        updateTab(t => {
+            const a = ordered.indexOf(anchod)
+            const b = ordered.indexOf(id)
+
+            if (a == -1 || b == -1) return t
+
+            const [start, end] = a < b ? [a, b] : [b, a]
+            return { ...t, selection: ordered.slice(start, end + 1) }
+        })
     }
 
     const value: TabContextType = {
@@ -207,7 +249,13 @@ export function TabProvider({ children }: { children: React.ReactNode }) {
         setSortOrder,
         getActiveTab,
         setActiveTab,
-        updateScroll
+        selectAll,
+        selectSingle,
+        toggleSelect,
+        rangeSelect,
+        clearSelection,
+        updateScroll,
+        setRenderOrder
     }
 
     return <TabContext.Provider value={value}>{children}</TabContext.Provider>

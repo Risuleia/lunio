@@ -4,7 +4,7 @@ use lunio_core::{EngineRuntime, fs::id::generate_file_id};
 
 #[test]
 fn thumbnail_works() {
-    let engine = EngineRuntime::new("./.lunio-cache-test".into());
+    let engine = EngineRuntime::new("./.lunio-cache-test".into(), None, None);
 
     engine.full_scan("C:\\Users\\hreet\\Pictures");
 

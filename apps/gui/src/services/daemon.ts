@@ -29,6 +29,10 @@ export async function getThumbnail(id: string) {
   return invoke<number[]>("cmd_get_thumbnail", { id });
 }
 
+export async function openFile(path: string) {
+  return invoke<void>("cmd_open_file", { path})
+}
+
 export async function shutdown() {
   return invoke<void>("cmd_shutdown");
 }

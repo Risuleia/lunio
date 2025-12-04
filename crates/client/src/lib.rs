@@ -13,6 +13,7 @@ pub enum Request {
     ListDir { path: String },
     RequestThumbnail { id: String },
     GetThumbnail { id: String },
+    OpenFile { path: String },
     Shutdown
 }
 
@@ -137,6 +138,16 @@ impl Client {
             }
             Response::Error { message } => Err(anyhow!(message)),
             _ => Err(anyhow!("invalid response")),
+        }
+    }
+
+    pub async fn open_file(&mut self, path: String) -> Result<()> {
+        let resp = self.send(Request::OpenFile { path: path.clone() }).await?;
+
+        match resp {
+            Response::Ok { data: Some(ResponseData::Ack) } => Ok(()),
+            Response::Error { message } => Err(anyhow!(message)),
+            _ => Err(anyhow!("invalid response"))
         }
     }
 

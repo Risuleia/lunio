@@ -1,0 +1,86 @@
+{
+    "version": 1,
+    "generated_at": "2025-12-02",
+    "ffmpeg": {
+        "required": true,
+        "platforms": {
+            "windows-x86_64": {
+                "version": "8.0",
+                "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.0-latest-win64-lgpl-shared-8.0.zip",
+                "sha256": "5dd3d9052f0ab5407d03391a1003b886816669c0272c2a491ae829d926a32659",
+                "path": "bin/ffmpeg.exe"
+            },
+            "windows-aarch64": {
+                "version": "8.0",
+                "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.0-latest-winarm64-lgpl-shared-8.0.zip",
+                "sha256": "f6240d2704a17101f9573d455e0c77257ae90e19913cbcba31eb98aeedf13d00",
+                "path": "bin/ffmpeg.exe"
+            },
+            "linux-x86_64": {
+                "version": "8.0",
+                "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.0-latest-linux64-lgpl-shared-8.0.tar.xz",
+                "sha256": "2dcedb0f65f9c37fad5990540f17c68bdd5526c5d1aa020ee47d371b2bb511b6",
+                "path": "bin/ffmpeg"
+            },
+            "linux-aarch64": {
+                "version": "8.0",
+                "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.0-latest-linuxarm64-lgpl-shared-8.0.tar.xz",
+                "sha256": "6ac77ee49dcaf698649ba9f1dfbf7920226ccbb0b4fc4a07dc8c286a073b1945",
+                "path": "bin/ffmpeg"
+            },
+            "macos-x86_64": {
+                "version": "8.0.1",
+                "url": "https://evermeet.cx/ffmpeg/getrelease/zip",
+                "sha256": "",
+                "path": "ffmpeg"
+            },
+            "macos-aarch64": {
+                "version": "8.0.1",
+                "url": "https://evermeet.cx/ffmpeg/getrelease/zip",
+                "sha256": "",
+                "path": "ffmpeg"
+            }
+        }
+    },
+    "pdfium": {
+        "required": true,
+        "platforms": {
+            "windows-x86_64": {
+                "version": "144.0.7557.0",
+                "url": "https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-win-x64.tgz",
+                "sha256": "5ff9b78a6993bfac4b73680d8fb9f5ef38e42e216c43b9c541f8a85bb2d862d1",
+                "path": "pdfium.dll"
+            },
+            "windows-aarch64": {
+                "version": "144.0.7557.0",
+                "url": "https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-win-arm64.tgz",
+                "sha256": "824074af4bd78e8d614746cf01193ef529543f868b993623dce32487dab55428",
+                "path": "pdfium.dll"
+            },
+            "linux-x86_64": {
+                "version": "144.0.7557.0",
+                "url": "https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-x64.tgz",
+                "sha256": "4e77762fbbc22882909f8279c4e72ac0f4c593ff24c995678fd6cca7bf27c28c",
+                "path": "libpdfium.so"
+            },
+            "linux-aarch64": {
+                "version": "144.0.7557.0",
+                "url": "https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-linux-arm64.tgz",
+                "sha256": "15d72445976217b440e2a08ee8c50d66fe06381691321ab17e1e8d9ff8a7e8b1",
+                "path": "libpdfium.so"
+            },
+            "macos-x86_64": {
+                "version": "144.0.7557.0",
+                "url": "https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-x64.tgz",
+                "sha256": "dd4145863561eab47947a17d93f98caff13d2caac050618f81cc600567e01706",
+                "path": "libpdfium.dylib"
+            },
+            "macos-aarch64": {
+                "version": "144.0.7557.0",
+                "url": "https://github.com/bblanchon/pdfium-binaries/releases/latest/download/pdfium-mac-arm64.tgz",
+                "sha256": "3dd6769bde57aa77f6ca33b3270fb2b2e44e68c98e2236c1823910309df225c9",
+                "path": "libpdfium.dylib"
+            }
+        }
+    }
+}

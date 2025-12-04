@@ -40,6 +40,14 @@ pub fn cmd_get_thumbnail(id: String) -> Result<Vec<u8>, String> {
 }
 
 #[tauri::command]
+pub fn cmd_open_file(path: String) -> Result<(), String> {
+    with_client(|c| {
+        crate::client::RUNTIME
+            .block_on(c.open_file(path))
+    }).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn cmd_shutdown() -> Result<(), String> {
     with_client(|c| {
         crate::client::RUNTIME

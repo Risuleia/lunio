@@ -4,16 +4,6 @@ use image::{DynamicImage, GenericImageView, imageops::FilterType};
 
 use crate::thumbnails::generator::{ThumbnailError, ThumbnailResult};
 
-pub fn is_supposed_image(path: &Path) -> bool {
-    match path.extension().and_then(|e| e.to_str()).map(|s| s.to_lowercase()) {
-        Some(ext) => matches!(
-            ext.as_str(),
-            "png" | "jpg" | "jpeg" | "webp" | "bmp" | "gif" | "tiff" | "tif"
-        ),
-        None => false
-    }
-}
-
 pub fn generate_image_thumbnail(path: &Path, max_size: u32) -> ThumbnailResult<Vec<u8>> {
     let img = image::open(path)
         .map_err(|e| ThumbnailError::Image(e))?;

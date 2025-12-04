@@ -12,6 +12,8 @@ pub enum Request {
     RequestThumbnail { id: String },
     GetThumbnail { id: String },
 
+    OpenFile { path: String },
+
     Shutdown
 }
 

@@ -1,3 +1,5 @@
+#[cfg(target_os = "windows")]
+use std::process::Command;
 use std::{path::{Path, PathBuf}, sync::{Arc, atomic::{AtomicBool, Ordering}}, thread::{self, JoinHandle}};
 
 use notify::RecommendedWatcher;
@@ -15,8 +17,12 @@ pub struct EngineRuntime {
 }
 
 impl EngineRuntime {
-    pub fn new(cache_root: PathBuf) -> Self {
-        let cfg = ThumbnailConfig::new(cache_root.clone());
+    pub fn new(
+        cache_root: PathBuf,
+        ffmpeg: Option<PathBuf>,
+        pdfium: Option<PathBuf>
+    ) -> Self {
+        let cfg = ThumbnailConfig::new(cache_root.clone(), ffmpeg, pdfium);
         let cache = Arc::new(ThumbnailCache::new(cfg));
         
         let index = Arc::new(RwLock::new(SimpleIndex::new()));
@@ -128,6 +134,27 @@ impl EngineRuntime {
 
         out.sort_by_key(|m| (!matches!(m.kind, crate::models::FileKind::Directory), m.path.clone()));
         out
+    }
+
+    pub fn open_file(&self, path: &Path) -> anyhow::Result<()> {
+        let path = path.to_string_lossy().to_string();
+
+        #[cfg(target_os = "windows")]
+        Command::new("cmd")
+            .args(["/C", "start", "", &path])
+            .spawn()?;
+
+        #[cfg(target_os = "macos")]
+        Command::new("open")
+            .arg(&path)
+            .spawn()?;
+
+        #[cfg(target_os = "linux")]
+        Command::new("xdg-open")
+            .arg(&path)
+            .spawn()?;
+
+        Ok(())
     }
 }
 

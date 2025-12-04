@@ -30,6 +30,7 @@ pub fn run() {
             commands::cmd_list_dir,
             commands::cmd_request_thumbnail,
             commands::cmd_get_thumbnail,
+            commands::cmd_open_file,
             commands::cmd_shutdown,
             system::get_sidebar_entries
         ])

@@ -8,13 +8,13 @@ import { TabProvider } from "./contexts/TabContext";
 import ModalProvider from "./contexts/ModalOverlay";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <AppProvider>
-      <TabProvider>
-        <ModalProvider>
-          <App />
-        </ModalProvider>
-      </TabProvider>
-    </AppProvider>
-  </React.StrictMode>,
+	<React.StrictMode>
+		<AppProvider>
+			<TabProvider>
+				<ModalProvider>
+					<App />
+				</ModalProvider>
+			</TabProvider>
+		</AppProvider>
+	</React.StrictMode>,
 );

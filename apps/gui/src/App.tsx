@@ -5,15 +5,15 @@ import "./App.css";
 import Explorer from "./views/Explorer";
 
 function App() {
-  return (
-    <>
-      <Titlebar />
-      <main id="main">
-        <Sidebar />
-        <Explorer />
-      </main>
-    </>
-  );
+	return (
+		<>
+			<Titlebar />
+			<main id="main">
+				<Sidebar />
+				<Explorer />
+			</main>
+		</>
+	);
 }
 
 export default App;

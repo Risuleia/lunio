@@ -5,6 +5,7 @@ import { ExplorerItem } from "../../constants/ExplorerItem";
 import useThumbnail from "../../hooks/useThumbnail";
 import { openFile } from "../../services/daemon";
 import { useTabs } from "../../contexts/TabContext";
+import { sortItems } from "../../lib/sorting";
 
 type Column = ExplorerItem[];
 
@@ -27,19 +28,21 @@ export default function MasonryView({
 	register: (id: string, el: HTMLElement | null) => void
 }) {
 	const [columns, setColumns] = useState<Column[]>([])
+	const { setRenderOrder, getActiveTab } = useTabs()
+	const tab = getActiveTab()
 
 	const folders = useMemo(() => entries.filter(e => e.isDir), [entries])
-	const media = useMemo(() => entries.filter(isMedia), [entries])
 	const files = useMemo(() => entries.filter(e => !e.isDir && !isMedia(e)), [entries])
+	const media = useMemo(() => 
+		sortItems(entries.filter(isMedia), tab.sortMode, tab.sortOrder),
+		[entries, tab.sortMode, tab.sortOrder]
+	)
 
 	const containerRef = useRef<HTMLDivElement>(null)
 
-	const { setRenderOrder } = useTabs()
-
-
 	useEffect(() => {
 		setRenderOrder(media.map(i => i.id))
-	}, [entries])
+	}, [entries, tab.sortMode, tab.sortOrder])
 
 	useEffect(() => {
 		function layout() {
@@ -68,7 +71,7 @@ export default function MasonryView({
 		window.addEventListener("resize", layout);
 
 		return () => window.removeEventListener("resize", layout);
-	}, [entries]);
+	}, [entries, tab.sortMode, tab.sortOrder]);
 
 	return (
 		<>

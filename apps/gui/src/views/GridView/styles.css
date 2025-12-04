@@ -39,6 +39,9 @@
 .grid-tile .tile-thumb span {
     font-size: 5rem;
 }
+.grid-tile[data-folder="true"] .tile-thumb span {
+    font-variation-settings: 'FILL' 1;
+}
 .grid-tile .tile-name {
     width: 100%;
     overflow: hidden;

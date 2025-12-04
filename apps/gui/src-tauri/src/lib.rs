@@ -8,6 +8,12 @@ mod system;
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
+            // tauri::async_runtime::spawn(async {
+            //     if let Err(e) = crate::client::start_client().await {
+            //         eprintln!("client start failed: {e}");
+            //     }
+            // });
+            
             let window = app.get_webview_window("main").unwrap();
 
             #[cfg(target_os = "macos")]

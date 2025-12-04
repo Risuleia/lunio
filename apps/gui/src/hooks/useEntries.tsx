@@ -16,7 +16,7 @@ export default function useEntries(tab: TabState): UseEntriesType {
 
     async function getEntries() {
         const location = tab.location
-        if (location.startsWith("virtual://")) return
+        if (location.startsWith("virtual://")) return setEntries([])
         
         console.log("[Explorer] requesting listDir:", location);
         

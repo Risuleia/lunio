@@ -25,6 +25,7 @@ export default function useThumbnail(id: string, enabled = true): string | null 
         async function poll() {
             try {
                 const bytes = await getThumbnail(id)
+                console.log(bytes)
 
                 if (bytes?.length) {
                     const url = bytesToDataUrl(bytes)

@@ -3,7 +3,7 @@ import { Group } from "../grouping/types";
 import { naturalCompare } from "./naturalCompare";
 import { SortMode, SortOrder } from "./types";
 
-function sortItems(
+export function sortItems(
     items: ExplorerItem[],
     mode: SortMode,
     order: SortOrder

@@ -2,7 +2,7 @@ use std::{path::Path};
 use rayon::iter::{ParallelBridge, ParallelIterator};
 use walkdir::{DirEntry, WalkDir};
 
-use crate::{fs::id::generate_file_id, models::FileMeta};
+use crate::{METADTA_VERSION, fs::id::generate_file_id, models::FileMeta};
 
 #[inline]
 fn is_valid(entry: &DirEntry) -> bool {
@@ -20,10 +20,10 @@ pub fn scan_root<P: AsRef<Path>>(root: P) -> Vec<FileMeta> {
         .filter_map(|entry| {
             let path = entry.path().to_path_buf();
             let metadata = entry.metadata().ok()?;
-            let id = generate_file_id(&path);
+            let id = generate_file_id(&path)?;
 
             Some(FileMeta {
-                version: 1,
+                version: METADTA_VERSION,
                 id,
                 path,
                 size: metadata.len(),

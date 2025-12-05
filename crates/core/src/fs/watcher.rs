@@ -36,12 +36,18 @@ pub fn start_watcher(root: PathBuf) -> NotifyResult<FsWatcher> {
 
         for path in event.paths {
             if matches!(event.kind, notify::EventKind::Remove(_)) {
-                let id = generate_file_id(&path);
+                let id = match generate_file_id(&path) {
+                    Some(id) => id,
+                    None => continue
+                };
                 let _ = tx.send(FsChange::Deleted(id));
                 continue;
             }
             
-            let id = generate_file_id(&path);
+            let id = match generate_file_id(&path) {
+                Some(id) => id,
+                None => continue
+            };
 
             if let Some(meta) = read_metadata(&path) {
                 if matches!(event.kind, notify::EventKind::Create(_)) {

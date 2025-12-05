@@ -1,13 +1,13 @@
 use std::{fs, path::Path};
 
-use crate::{fs::id::generate_file_id, models::FileMeta};
+use crate::{METADTA_VERSION, fs::id::generate_file_id, models::FileMeta};
 
 pub fn read_metadata(path: &Path) -> Option<FileMeta> {
     let meta = fs::metadata(path).ok()?;
-    let id = generate_file_id(path);
+    let id = generate_file_id(path)?;
 
     Some(FileMeta {
-        version: 1,
+        version: METADTA_VERSION,
         id,
         path: path.to_path_buf(),
         size: meta.len(),

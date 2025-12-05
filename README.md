@@ -1,208 +1,264 @@
 # Lunio
 
-Lunio is a high-performance, cross-platform desktop file explorer powered by a custom Rust daemon and a Tauri + React frontend. It is engineered for responsiveness, scalability, and media-heavy workloads, with a strict separation between UI rendering and filesystem operations. The system is capable of handling large directories, complex metadata workloads, and asynchronous thumbnail generation without blocking the interface.
+Lunio is a high-performance, daemon-driven desktop file explorer built with Rust, Tauri, and React.  
+It is engineered for responsiveness, large directory handling, media-rich environments, and strict separation between UI and filesystem operations.
+
+The backend owns all state, indexing, metadata extraction, and thumbnail generation, while the frontend is a thin, reactive renderer connected through an asynchronous, versioned IPC protocol.
 
 ---
 
 ## Overview
 
-Lunio adopts a daemon-driven architecture where all filesystem, indexing, and processing responsibilities are delegated to a persistent background service. The frontend communicates with this daemon through a structured TCP protocol, ensuring consistent performance and a stable API surface.
+Lunio replaces traditional, UI-bound filesystem calls with a persistent Rust daemon responsible for:
 
-Key characteristics include:
-- Dedicated Rust daemon for all file operations  
-- Fully asynchronous IPC communication  
-- Non-blocking UI with cancelable operations  
-- Scalable indexing and metadata caching  
-- High-quality thumbnail generation for images, videos, and PDFs  
+- Directory scanning and metadata extraction  
+- Incremental indexing and fast lookups  
+- Thumbnail generation for images, PDFs, and videos  
+- Background rescanning  
+- File opening and system operations  
+- Runtime toolchain bootstrapping for FFmpeg and PDFium  
+
+The frontend never accesses the filesystem directly.  
+All interactions occur through a typed, binary-safe TCP protocol implemented by the `lunio_client` library.
 
 ---
 
 ## Architecture
 
-Lunio consists of three main components:
+             ┌──────────────────────────┐
+             │        Frontend UI       │
+             │    (Tauri + React TS)    │
+             └──────────────┬───────────┘
+                            │
+               lunio_client │  (async TCP)
+                            ▼
+             ┌──────────────────────────┐
+             │          Daemon          │
+             │           (Rust)         │
+             ├─────────────┬────────────┤
+    Directory│             │ Thumbnail  │
+     Queries │   Indexing  │   Worker   │ Thumbnail
+             ▼   Engine    │   Thread   │ Jobs
+             │ (Arc State) │            ▼
+             └─────────────┼────────────┘
+                           │
+                           ▼
+             ┌──────────────────────────┐
+             │  Runtime Dependencies    │
+             │  FFmpeg / PDFium Loader  │
+             └──────────────────────────┘
 
-### 1. Daemon (Rust)
-A long-running process responsible for:
-- Directory scanning  
-- Metadata extraction  
-- File and folder operations  
-- Incremental indexing  
-- Thumbnail generation  
-- Runtime dependency management  
-- Request processing and concurrency control  
-
-### 2. IPC Layer (`lunio_client`)
-A Rust client library that provides:
-- TCP-based communication over localhost  
-- Length-prefixed JSON message encoding  
-- Typed request/response definitions  
-- Versioned handshake and compatibility checks  
-- Asynchronous, cancelable operations  
-
-### 3. Frontend (Tauri + React)
-A modern user interface that supports:
-- Grid, List, and Masonry layouts  
-- High-performance virtualized rendering  
-- Complex selection mechanics  
-- Thumbnail streaming  
-- Sorting and grouping by multiple attributes  
 
 ---
 
-## Core Features
+## System Design
 
-### File Operations
-- Asynchronous directory listing  
-- Fast metadata retrieval  
-- Full-text search  
-- Native OS file opening  
-- Background rescanning  
+### Components
 
-### User Interface
+**1. Daemon (Rust)**
+- Single authoritative store for file metadata  
+- Manages a shared `EngineRuntime` behind `Arc`  
+- Schedules and processes thumbnail tasks  
+- Hosts structured, versioned IPC protocol  
+- Handles runtime dependency installation  
+
+**2. IPC Layer (`lunio_client`)**
+- Asynchronous TCP communication  
+- Length-prefixed, JSON-encoded messages  
+- Typed request/response enums  
+- Handshake with version negotiation  
+- Cancelable and interruptible operations  
+
+**3. Frontend (Tauri + React)**
 - Grid, List, and Masonry views  
-- Sorting (name, size, date, type)  
-- Grouping (extension, type, date)  
-- Instant visual feedback from daemon responses  
+- Real-time thumbnail streaming  
+- Virtualized rendering for large folders  
+- Advanced multi-selection and lasso tools  
+- Debounced and cancelable navigation flows  
 
-### Selection System
-- Ctrl / Cmd multi-selection  
-- Shift range selection  
-- Box (drag) selection  
-- Freeform lasso selection  
-- Escape clear / Ctrl+A select all  
-- High-precision hit-testing via point-in-polygon algorithms  
-- Path smoothing using Bézier curves and Savitzky–Golay filtering  
+---
+
+## Detailed Diagrams
+
+### 1. Request Lifecycle
+
+            UI Action
+                │
+                ▼
+          lunio_client → DirectoryListRequest → Daemon
+                │
+                │ (previous listing cancelled)
+                ▼
+          EngineRuntime → Directory scan → Metadata model
+                │
+                ▼
+        Thumbnail jobs queued → Worker thread
+                │
+                ▼
+        Daemon streams results → UI renders incrementally
+
+---
+
+### 2. Thumbnail Pipeline
+
+            File Entry
+                │
+                ├── Cache Hit → Return immediately
+                │
+                └── Cache Miss
+                │
+                ▼
+            Thumbnail Job Queue
+                │
+                ▼
+          Worker Thread → Decode/Render
+                │
+                ▼
+      Store in Memory Cache + Disk Cache
+                │
+                ▼
+            Send to UI
+
+
+---
+
+### 3. Dependency Installation Flow
+
+    Daemon Startup
+    │
+    ├─ Load embedded manifest
+    ├─ Check runtime directory
+    ├─ Download FFmpeg / PDFium if missing
+    ├─ Validate checksums
+    ├─ Extract to sandboxed directory
+    └─ Register with thumbnail subsystem
+
 
 ---
 
 ## Daemon
 
-The daemon owns a centralized, thread-safe indexing engine (`EngineRuntime`) stored behind an `Arc`. It processes all client requests asynchronously and ensures that no operation blocks the UI. Responsibilities include:
+The daemon runs independently of the UI and exposes structured commands for:
 
-- Maintaining an in-memory index  
-- Syncing state with disk changes  
-- Scheduling and executing thumbnail jobs  
-- Managing external tools (FFmpeg, PDFium)  
-- Providing cancelable directory queries  
+- Directory listing  
+- Metadata lookup  
+- Search queries  
+- Thumbnail requests  
+- File opening  
+- Background scanning  
+- Graceful shutdown  
+
+It ensures:
+- Cancelable queries  
+- Zero blocking of the UI  
+- Consistent performance across platforms  
 
 ---
 
 ## IPC Protocol
 
-Lunio’s protocol is designed for safety, forward compatibility, and performance:
+- Transport: **TCP (localhost)**  
+- Encoding: **Length-prefixed frames**  
+- Payload: **JSON**  
+- Commands grouped into categories:
+  - Directory operations  
+  - Search  
+  - Thumbnails  
+  - System actions (open file, shutdown)  
+  - Engine status/metrics  
 
-- **Transport:** TCP  
-- **Encoding:** Length-prefixed frames with JSON payloads  
-- **Handshake:** Version-negotiated session initialization  
-- **Message Types:**  
-  - Directory listing  
-  - Background scan  
-  - Thumbnail request  
-  - Search query  
-  - File open request  
-  - Engine status queries  
-  - Shutdown  
-
-All operations are asynchronous, and long-running actions can be cancelled by the client.
+The protocol begins with a versioned handshake allowing forward-compatible evolution.
 
 ---
 
 ## Indexing Engine
 
-The indexing engine tracks:
+The indexing engine (`EngineRuntime`) maintains:
+
 - File paths  
+- File/folder type  
 - Sizes  
 - Modification timestamps  
-- Types (file, directory)  
-- Categories (media, documents, etc.)  
 - Thumbnail availability  
+- Categorization (image, video, document, etc.)  
 
-It supports:
-- Fast directory lookups  
-- Incremental scanning  
-- Concurrent reads and writes  
-- Stable ID-based lookups  
+Capabilities:
+
+- Thread-safe lookup and mutation  
+- Fast directory queries  
+- Stable ID mapping  
+- Incremental rescanning  
 
 ---
 
-## Thumbnails
+## Thumbnail System
 
-The thumbnail subsystem is built for reliability and concurrency:
-
-### Supported Formats
-- Images (via the `image` crate)  
+### Supported formats
+- Images (PNG, JPEG, WebP, etc.)  
 - PDFs (via PDFium)  
 - Videos (via FFmpeg)  
 
-### Pipeline
-- Job-queue-based architecture  
+### Features
 - Dedicated worker thread  
-- Non-blocking scheduling  
-- Progressive delivery to the UI  
-
-### Caching
+- Non-blocking job queue  
 - In-memory LRU cache  
-- Persistent on-disk cache  
-- Regeneration when data is missing or outdated  
+- Disk cache for persisted thumbnails  
+- Regeneration when stale or missing  
 
 ---
 
-## Runtime Dependencies
+## Frontend Technology
 
-To maintain portability, Lunio downloads required external binaries at runtime:
-
-- **FFmpeg** for video frame extraction  
-- **PDFium** for PDF rendering  
-
-The daemon:
-1. Loads a platform manifest  
-2. Downloads the required tools  
-3. Verifies integrity checks  
-4. Extracts them into a private runtime directory  
-5. Registers them with the thumbnail subsystem  
-
-If a dependency cannot be installed, the system continues operating with the corresponding feature disabled and retries on next launch.
+- **Tauri** for cross-platform desktop runtime  
+- **React + TypeScript** for UI  
+- **Virtualized rendering** for large directories  
+- **Smooth navigation & transitions**  
+- **Thumbnail streaming from the daemon**  
+- **State-independent, declarative rendering**  
 
 ---
 
-## Frontend
+## Selection & Lasso System
 
-The Tauri + React interface focuses on responsiveness and clarity:
+Lunio includes a high-precision, view-agnostic selection engine:
 
-- View virtualization for large directories  
-- Real-time rendering updates  
-- Thumbnail streaming and progressive loading  
-- Advanced selection tools  
-- Fully async communication layer  
-- Graceful cancellation of outdated operations  
+- Ctrl / Cmd additive selection  
+- Shift range selection  
+- Drag-box selection  
+- Freehand lasso selection  
+- Path smoothing using **Bézier curves**  
+- Noise reduction via **Savitzky–Golay filter**  
+- Point-in-polygon hit testing for accuracy  
 
 ---
 
-## Performance Characteristics
+## Performance Model
 
-Major performance considerations:
-- All IPC operations are asynchronous  
-- Directory listings can be cancelled mid-processing  
-- Thumbnail generation is fully offloaded to worker threads  
-- The engine avoids locking bottlenecks via fine-grained concurrency  
-- UI never directly touches filesystem APIs  
+The system is designed to keep the UI responsive at all times:
 
-Navigating between folders cancels previous tasks immediately, ensuring smooth and uninterrupted interaction.
+- All filesystem work is asynchronous  
+- `tokio::mpsc` worker model for request routing  
+- One-shot channels for isolated responses  
+- Abortable tasks for directory listing and search  
+- Incremental results streamed to UI  
+- No synchronous filesystem calls inside the frontend  
 
 ---
 
 ## Current Status
 
-Lunio currently includes:
+- Fully operational daemon  
+- Async IPC protocol implemented  
+- Thumbnail system complete (images, PDF, video)  
+- Runtime installer for FFmpeg & PDFium  
+- Stable indexing engine  
+- Responsive Tauri + React frontend  
+- Advanced selection and lasso mechanics  
+- Incremental directory listing with cancellation  
+- Smooth, non-blocking UI  
 
-- [X] Functional explorer with all core navigation features  
-- [X] Fully implemented async daemon and IPC client  
-- [X] Thumbnail generation for images, PDFs, and videos  
-- [X] Automatic FFmpeg/PDFium management  
-- [X] Cancelable directory operations  
-- [X] Complete selection and lasso system  
-- [X] Stable, versioned protocol  
-- [X] Responsive, production-grade user interface  
+---
 
-The foundation is complete, and further feature development is ongoing.
+## License
 
+Proprietary — All rights reserved.

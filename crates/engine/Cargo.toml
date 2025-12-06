@@ -1,0 +1,23 @@
+[package]
+name = "lunio_engine"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+anyhow = "1.0.100"
+base64 = "0.22.1"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+tokio = { version = "1.48.0", features = ["full"] }
+lunio_protocol = { version = "0.1.0", path = "../protocol" }
+notify = "8.2.0"
+uuid = { version = "1.19.0", features = ["v4", "serde"] }
+bincode = { version = "2.0.1", features = ["serde", "derive"] }
+sha2 = "0.10.9"
+image = "0.25.9"
+pdfium-render = "0.8.37"
+unicode-normalization = "0.1.25"
+chrono = "0.4.42"
